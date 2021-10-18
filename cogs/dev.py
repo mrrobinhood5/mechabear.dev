@@ -1,5 +1,6 @@
 import disnake
 from disnake.ext import commands
+from utils import checks
 
 
 class DevCommands(commands.Cog, name='Developer', command_attrs=dict(hidden=True)):
@@ -8,7 +9,7 @@ class DevCommands(commands.Cog, name='Developer', command_attrs=dict(hidden=True
     def __init__(self, bot):
         self.bot = bot
 
-    # @bot_checks.is_admin()
+    @checks.is_owner()
     @commands.command(name="load")
     async def load(self, ctx, cog):
         """
@@ -22,8 +23,8 @@ class DevCommands(commands.Cog, name='Developer', command_attrs=dict(hidden=True
         except commands.errors.ExtensionNotFound:
             await ctx.send(f"`{cog}` does not exist!")
 
-    # @bot_checks.is_admin()
-    @commands.command(name='reload', aliases=['rl'])
+    @checks.is_owner()
+    @commands.command(name='reload')
     async def reload(self, ctx, cog):
         """
         Reloads a cog.
@@ -41,6 +42,21 @@ class DevCommands(commands.Cog, name='Developer', command_attrs=dict(hidden=True
             await ctx.send(f'Reloaded the {cog[5:].title()}, master.')  # Sends a message where content='Done'
         else:
             await ctx.send('Unknown Cog')  # If the cog isn't found/loaded.
+
+    @checks.is_owner()
+    @commands.command(name="unload")
+    async def unload(self, ctx, cog):
+        """
+        Unload a cog.
+        """
+        await ctx.message.delete()
+        cog = f'cogs.{cog}'
+        extensions = self.bot.extensions
+        if cog not in extensions:
+            await ctx.send("Cog is not loaded!")
+            return
+        self.bot.unload_extension(cog)
+        await ctx.send(f"`{cog}` has successfully been unloaded, Master.")
 
     @commands.slash_command(description="Responds with 'World'")
     async def hello(self, inter: disnake.ApplicationCommandInteraction):

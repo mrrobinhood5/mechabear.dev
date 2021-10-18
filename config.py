@@ -12,4 +12,4 @@ DB_URL = os.getenv("DB_URL")
 
 # cogs
 cogs = os.listdir("./cogs")
-cogs.remove("__pycache__")
+cogs.remove("__pycache__") if "__pycache__" in cogs else 0

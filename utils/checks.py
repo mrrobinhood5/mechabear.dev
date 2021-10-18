@@ -10,3 +10,14 @@ def is_owner():
             ctx.send("You are not the Owner of this bot, I DONT KNOW YOU!")
 
     return commands.check(predicate)
+
+
+def is_dm():
+    async def predicate(ctx):
+        for role in ctx.author.roles:
+            if role.name == "Quest Master" or role.name == "Dungeon Master":
+                return True
+        else:
+            await ctx.send("You are not a DM/GM")
+
+    return commands.check(predicate)

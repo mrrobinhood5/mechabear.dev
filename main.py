@@ -22,6 +22,7 @@ bot = commands.Bot(command_prefix=BOT_PREFIX, intents=intents, test_guilds=TEST_
 # instance of the database
 db = motor.motor_asyncio.AsyncIOMotorClient(
     f"mongodb+srv://{DB_USER}:{DB_PASSWORD}@{DB_URL}")
+bot.__setattr__("db", db.Mecha)
 
 # logger setup
 logger = logging.getLogger('disnake')

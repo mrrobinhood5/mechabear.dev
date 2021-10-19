@@ -9,7 +9,7 @@ class DevCommands(commands.Cog, name='Developer', command_attrs=dict(hidden=True
     def __init__(self, bot):
         self.bot = bot
 
-    @checks.is_owner()
+    @checks.is_god()
     @commands.command(name="load")
     async def load(self, ctx, cog):
         """
@@ -23,7 +23,7 @@ class DevCommands(commands.Cog, name='Developer', command_attrs=dict(hidden=True
         except commands.errors.ExtensionNotFound:
             await ctx.send(f"`{cog}` does not exist!")
 
-    @checks.is_owner()
+    @checks.is_god()
     @commands.command(name='reload')
     async def reload(self, ctx, cog):
         """
@@ -35,15 +35,16 @@ class DevCommands(commands.Cog, name='Developer', command_attrs=dict(hidden=True
             for extension in extensions:
                 self.bot.unload_extension(extension)
                 self.bot.load_extension(extension)
-            await ctx.send('Reloaded all Cogs')
+            return await ctx.send('Reloaded all Cogs')
+        cog = f'cogs.{cog}'
         if cog in extensions:
             self.bot.unload_extension(cog)  # Unloads the cog
             self.bot.load_extension(cog)  # Loads the cog
-            await ctx.send(f'Reloaded the {cog[5:].title()}, master.')  # Sends a message where content='Done'
+            await ctx.send(f'Reloaded the {cog} cog, master.')  # Sends a message where content='Done'
         else:
             await ctx.send('Unknown Cog')  # If the cog isn't found/loaded.
 
-    @checks.is_owner()
+    @checks.is_god()
     @commands.command(name="unload")
     async def unload(self, ctx, cog):
         """

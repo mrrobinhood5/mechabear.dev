@@ -1,7 +1,8 @@
+import disnake
 from disnake.ext import commands
 from disnake import Option, OptionType
 from utils import checks
-from utils.dmClasses import DmQuest, DmQuestNew
+from utils.dmClasses import DmQuest
 
 
 # from utils.classes import DmQuest
@@ -23,7 +24,7 @@ class DmCommands(commands.Cog, name='DM Commands'):
                                     type=OptionType.string, required=True)])
     async def dm_new_quest(self, ctx, name):
         # make an object
-        quest = DmQuest.make(ctx, name)
+        quest = DmQuest(ctx, name)
         # create channels
         await quest.create_channels(ctx)
         # save to db
@@ -39,12 +40,26 @@ class DmCommands(commands.Cog, name='DM Commands'):
         # instantiate a quest object
         quest = DmQuest(ctx, name)
         # load it from db
-        quest.load(ctx)
+        await quest.load(ctx)
         # close it out
-        quest.complete(ctx, description)
+        await quest.complete(ctx, description)
         # sve to db
         quest.save(ctx)
-        return await ctx.response.send_message(f'Quest: `{quest.quest_name}` completed and added to DB.')
+        return await ctx.response.send_message(f'Quest: `{quest.name}` completed and added to DB.')
+
+    @dm.sub_command(name="add_member", description="Tag all members you wish to add",
+                    options=[Option("name", "The name of the quest",
+                                    type=OptionType.string, required=True)])
+    async def add_member(self, ctx, name, *members: disnake.Member):
+        # instantiate a quest object
+        quest = DmQuest(ctx, name)
+        # load it from db
+        await quest.load(ctx)
+        # add members
+        await quest.add_members(ctx, members)
+        # save to db
+        quest.save(ctx)
+        return await ctx.response.send_message(f'You added {quest.quest_members} to {quest.name} quest')
 
 
 def setup(bot):

@@ -37,6 +37,7 @@ logger.addHandler(handler)
 async def on_ready():
     print(f'I\'m in as {bot.user} with a "{bot.command_prefix}" prefix')
 
+# TODO: add an after loop event to load all the quests names and put them as an attribute on the bot.
 
 # loads the cogs
 for cog in cogs:

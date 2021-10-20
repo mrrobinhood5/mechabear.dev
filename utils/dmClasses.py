@@ -24,7 +24,7 @@ class DmQuest:
 
     @property
     def f(self):
-        return {"dm": str(self.dm.id), "server": str(self.server.id)}
+        return {"dm": str(self.dm.id), "server": str(self.server.id), "status": "Active"}
 
     async def create_channels(self, ctx: Context):
         self.quest_role = await self.server.create_role(name=self.name, permissions=Permissions.text(),
@@ -42,7 +42,7 @@ class DmQuest:
     async def destroy_channels(self, ctx: Context):
         channels = [self.dm_channel, self.ooc_channel, self.rp_channel, self.category]
         for channel in channels:
-            _c = ctx.guild.get_channel(int(channel))
+            _c = ctx.guild.get_channel(channel.id)
             await _c.delete()
 
     def save(self, ctx: Context):
@@ -65,27 +65,19 @@ class DmQuest:
         ctx.bot.db.dm_quests.update_one(self.f, {'$set': dm_quest}, upsert=True)
         return
 
-    async def add_members(self, ctx: Context, members: tuple):
+    async def add_player(self, ctx: Context, member: Member):
         _r = ctx.guild.get_role(self.quest_role)
-        for member in members:
-            if member is Member:
-                await member.add_roles(self.quest_role)
-                self.quest_members.append(str(member.id))
-            else:
-                continue
+        await member.add_roles(self.quest_role)
+        self.quest_members.append(str(member.id))
 
-    async def remove_members(self, ctx):
-        for member in self.quest_members:
-            _m = ctx.guild.get_member(int(member))
-            _r = ctx.guild.get_role(int(self.quest_role))
-            await _m.remove_roles(_r)
+    async def remove_roles(self):
+        await self.quest_role.delete()
 
     async def load(self, ctx: Context):
-        quests = ctx.bot.db.dm_quests.find(self.f) # its not finding the quests
+        quests = ctx.bot.db.dm_quests.find(self.f)
         async for q in quests:
-            print(q)
             if self.name in q['name']:
-                print("match_found")
+                print("match found")
                 self.name = q['name']
                 self.dm = ctx.guild.get_member(int(q['dm']))
                 self.server = ctx.bot.get_guild(int(q['server']))
@@ -110,7 +102,7 @@ class DmQuest:
         self.status = "Complete"
         # set the date
         self.date_completed = datetime.datetime.utcnow()
-        # remove roles from members
-        await self.remove_members(ctx)
+        # delete roles
+        await self.remove_roles()
         # destroy channels
         await self.destroy_channels(ctx)

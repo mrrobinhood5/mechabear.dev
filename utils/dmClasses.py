@@ -33,11 +33,16 @@ class DmQuest:
                                                                f'MechaBear')
         await self.dm.add_roles(self.quest_role)
         perms = {ctx.guild.me: CHANNEL_ADMIN, ctx.guild.default_role: CHANNEL_READ}
-        self.category = await ctx.guild.create_category(name=f'🏷{self.name}🏷')
+        self.category = await ctx.guild.create_category(name=f'🏷{self.name}🏷', overwrites=perms)
+
+        perms.update({self.quest_role: CHANNEL_READ_WRITE})
         self.rp_channel = await self.category.create_text_channel(name=f'🎭rp-{self.name}', overwrites=perms)
         self.ooc_channel = await self.category.create_text_channel(name=f'🎲ooc-{self.name}', overwrites=perms)
-        perms.update({self.quest_role: CHANNEL_READ_WRITE})
+
+        perms.update({ctx.guild.default_role: CHANNEL_HIDDEN})
         self.dm_channel = await self.category.create_text_channel(name=f'🧩dm-{self.name}', overwrites=perms)
+
+
 
     async def destroy_channels(self, ctx: Context):
         channels = [self.dm_channel, self.ooc_channel, self.rp_channel, self.category]

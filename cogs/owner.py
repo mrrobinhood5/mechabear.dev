@@ -4,9 +4,6 @@ from disnake import Option, OptionType
 from utils import checks
 
 
-# from utils.classes import DmQuest
-
-
 class OwnerCommands(commands.Cog, name='Owner Commands'):
 
     def __init__(self, bot):

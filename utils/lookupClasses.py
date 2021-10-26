@@ -2,8 +2,6 @@ from bs4 import BeautifulSoup as bs
 from requests import request
 import re
 from disnake import Embed
-import lxml
-
 
 CORE_INDEX = 'https://raw.githubusercontent.com/aurorabuilder/elements/master/core.index'
 
@@ -116,7 +114,7 @@ class LookupFeat(Lookup):
         self.name = ""
         self.description = ""
         self.sheet = ""
-        self.rules = ""
+        # self.rules = ""
         self.source = ""
         self.match_found = False
         self.__post__()
@@ -147,7 +145,7 @@ class LookupFeat(Lookup):
         self.name = feat['name']
         self.description = feat.description.text
         self.sheet = feat.sheet.description.text
-        self.rules = f'{feat.rules.stat["name"].title()} +{feat.rules.stat["value"]}'
+        # self.rules = f'{feat.rules.stat["name"].title()} +{feat.rules.stat["value"]}'
         self.source = feat['source']
 
     def build_embed(self, ctx):
@@ -160,12 +158,13 @@ class LookupFeat(Lookup):
         if len(self.results) != 1:
             for feat, source in self.results:
                 _r += f'{feat}.{source.replace(" ", "_").replace("’", "")}\n'
+            _r += f'```'
+            _e.add_field(name="Results", value=_r)
         else:
-            _r += f'Name: "{self.name}"\n'
-            _r += f'Description: "{self.description}"\n'
-            _r += f'Sheet Actions: "{self.sheet}"\n'
-            _r += f'Rules: "{self.rules}"\n'
-            _r += f'Source: "{self.source}"\n'
-        _r += f'```'
-        _e.add_field(name="Results", value=_r)
+            _e.add_field(name=self.name,
+                         value=self.description)
+            _e.add_field(name="Sheet Actions",
+                         value=self.sheet)
+            _e.add_field(name="Source",
+                         value=f'`{self.source}`')
         return _e

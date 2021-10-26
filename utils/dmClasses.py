@@ -31,18 +31,14 @@ class DmQuest:
                                                         mentionable=True,
                                                         reason=f'New Quest created by {self.dm.display_name} in '
                                                                f'MechaBear')
-        await self.dm.add_roles(self.quest_role)
-        perms = {ctx.guild.me: CHANNEL_ADMIN, ctx.guild.default_role: CHANNEL_READ}
-        self.category = await ctx.guild.create_category(name=f'🏷{self.name}🏷', overwrites=perms)
+        self.category = await ctx.guild.create_category(name=f'🏷{self.name}🏷')
+        self.rp_channel = await self.category.create_text_channel(name=f'🎭rp-{self.name}')
+        self.ooc_channel = await self.category.create_text_channel(name=f'🎲ooc-{self.name}')
+        self.dm_channel = await self.category.create_text_channel(name=f'🧩dm-{self.name}')
+        self.fix_permissions(ctx)
 
-        perms.update({self.quest_role: CHANNEL_READ_WRITE})
-        self.rp_channel = await self.category.create_text_channel(name=f'🎭rp-{self.name}', overwrites=perms)
-        self.ooc_channel = await self.category.create_text_channel(name=f'🎲ooc-{self.name}', overwrites=perms)
-
-        perms.update({ctx.guild.default_role: CHANNEL_HIDDEN})
-        self.dm_channel = await self.category.create_text_channel(name=f'🧩dm-{self.name}', overwrites=perms)
-
-
+    async def fix_permissions(self, ctx: Context):
+        _roles = await ctx.bot.db.find_one({"server_id": str(ctx.guild.id)})
 
     async def destroy_channels(self, ctx: Context):
         channels = [self.dm_channel, self.ooc_channel, self.rp_channel, self.category]
@@ -77,6 +73,7 @@ class DmQuest:
 
     async def remove_roles(self):
         await self.quest_role.delete()
+
 
     async def load(self, ctx: Context):
         quests = ctx.bot.db.dm_quests.find(self.f)

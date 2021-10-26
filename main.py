@@ -1,6 +1,5 @@
 import disnake
 import logging
-from jishaku.cog import Jishaku
 from disnake.ext import commands
 import motor.motor_asyncio
 from config import *
@@ -41,13 +40,9 @@ async def on_ready():
 
 # loads the cogs
 for cog in cogs:
-    bot.load_extension(f'cogs.{cog.rstrip(".py")}')
+    bot.load_extension(f'cogs.{cog[:-3]}')
     # bot.load_extension(cog)
 
 # runs the client
 # client.run(BOT_TOKEN)
 bot.run(BOT_TOKEN)
-
-
-
-

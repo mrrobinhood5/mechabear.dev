@@ -44,7 +44,11 @@ class DmCommands(commands.Cog, name='DM Commands'):
         # load it from db
         await quest.load(ctx)
         # close it out
-        await quest.complete(ctx, description)
+        if quest.quest_role:
+            await quest.complete(ctx, description)
+        else:
+            return await ctx.edit_original_message(content=f"Quest not found, make sure you include part of the "
+                                                           f"active quest.")
         # sve to db
         quest.save(ctx)
         return await ctx.edit_original_message(content=f'Quest: `{quest.name}` completed and added to DB.')
@@ -76,7 +80,7 @@ class DmCommands(commands.Cog, name='DM Commands'):
         # TODO: make this paginated
         await ctx.response.defer()
         e = Embed(title="List of Quests", description=f'List of quests with DM: `{ctx.author.name}`')
-        e. set_thumbnail(ctx.author.display_avatar.url)
+        e.set_thumbnail(ctx.author.display_avatar.url)
 
         f = {"server": str(ctx.guild.id), "dm": str(ctx.author.id)}
         if status == "Active" or status == "Complete":
